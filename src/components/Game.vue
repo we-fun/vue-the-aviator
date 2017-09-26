@@ -15,19 +15,22 @@
 </template>
 
 <script>
-/* eslint-disable comma-spacing, key-spacing */
+/* eslint-disable semi, comma-spacing, key-spacing */
 /* eslint-disable comma-dangle, space-infix-ops, no-floating-decimal */
 /* eslint-disable space-before-blocks, space-in-parens, quotes */
 /* eslint-disable keyword-spacing */
+/* eslint-disable space-before-function-paren */
 import * as THREE from 'three'
+import AirPlane from './AirPlane'
+import { Colors } from './common'
 
-var Colors = {
-  red: 0xf25346,
-  white: 0xd8d0d1,
-  brown: 0x59332e,
-  pink: 0xF5986E,
-  brownDark: 0x23190f,
-  blue: 0x68c3c0,
+function normalize(v, vmin, vmax, tmin, tmax){
+  var nv = Math.max(Math.min(v,vmax), vmin);
+  var dv = vmax-vmin;
+  var pc = (nv-vmin)/dv;
+  var dt = tmax-tmin;
+  var tv = tmin + (pc*dt);
+  return tv;
 }
 
 export default {
@@ -36,6 +39,10 @@ export default {
   data () {
     return {
       ui: {
+        mouse: { x: 0, y: 0 },
+        airplane: {
+          position: { y: 100 }
+        },
         sea: {
           position: { y: -600 },
           rotation: { z: 0 }
@@ -69,12 +76,25 @@ export default {
 
     this.sea = this.createSea()
     this.sky = this.createSky()
+    this.airplane = this.createAirPlane()
   },
 
   methods: {
     loop () {
       this.ui.sea.rotation.z += .005
       this.ui.sky.rotation.z += .01
+      // update plane
+      var targetY = normalize(this.ui.mouse.y,-.75,.75,25, 175);
+      var targetX = normalize(this.ui.mouse.x,-.75,.75,-100, 100);
+      this.ui.airplane.position.y = targetY;
+      this.ui.airplane.position.x = targetX;
+      if (this.airplane && this.airplane.propeller) this.airplane.propeller.rotation.x += 0.3;
+    },
+
+    createAirPlane () {
+      let airplane = new AirPlane();
+      airplane.mesh.scale.set(.25,.25,.25);
+      return airplane
     },
 
     createSky () {
