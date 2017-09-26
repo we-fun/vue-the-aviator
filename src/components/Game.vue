@@ -6,11 +6,12 @@
         :position="ui.camera.position"></camera>
 
       <!-- 先注释掉这个light 效果不对 可能是three版本变化 -->
-      <!--<light :obj="light1"></light>-->
-      <light :obj="light2"
+      <!--<light :obj="lights[0]"></light>-->
+      <!-- <light :obj="lights[1]"></light> -->
+      <light :obj="lights[2]"
         :position="ui.light2.position"></light>
 
-      <object3d :obj="sea"
+      <object3d :obj="sea.mesh"
         :position="ui.sea.position"
         :rotation="ui.sea.rotation"></object3d>
       <object3d :obj="sky"
@@ -33,6 +34,7 @@
 /* eslint-disable space-before-function-paren */
 import * as THREE from 'three'
 import Airplane from './Airplane'
+import Sea from './Sea'
 import { Colors } from './common'
 
 function normalize(v, vmin, vmax, tmin, tmax){
@@ -88,33 +90,38 @@ export default {
     this.renderer = this.createRenderer()
     this.scene = this.createScene()
     this.camera = this.createCamera()
-    ;[this.light1, this.light2] = this.createLights()
+    this.lights = this.createLights()
 
-    this.sea = this.createSea()
     this.sky = this.createSky()
-    this.airplane = this.createAirplane()
+    this.airplane = new Airplane()
+    this.sea = new Sea()
   },
 
   methods: {
     loop () {
+      this.sea.moveWaves()
       this.ui.sea.rotation.z += .005
       this.ui.sky.rotation.z += .01
-      // update plane
-      var targetY = normalize(this.ui.mouse.y,-.75,.75,25, 175);
-      var targetX = normalize(this.ui.mouse.x,-.75,.75,-100, 100);
-      this.ui.airplane.position.y = targetY;
-      this.ui.airplane.position.x = targetX;
-      if (this.airplane && this.airplane.propeller) this.airplane.propeller.rotation.x += 0.3;
+      this.updatePlane()
+      this.updateCamera()
+    },
+    updateCamera () {
+      let { camera, ui: { mouse } } = this
+      camera.fov = normalize(mouse.x,-1,1,40, 80);
+      camera.updateProjectionMatrix();
+    },
+    updatePlane () {
+      let { airplane, ui: { mouse } } = this
+      var targetY = normalize(mouse.y,-.75,.75,25, 175);
+      airplane.mesh.position.y += (targetY-airplane.mesh.position.y)*0.1;
+      airplane.mesh.rotation.z = (targetY-airplane.mesh.position.y)*0.0128;
+      airplane.mesh.rotation.x = (airplane.mesh.position.y-targetY)*0.0064;
+      airplane.propeller.rotation.x += 0.3;
     },
     handleMouseMove (e) {
       var tx = -1 + (event.clientX / this.WIDTH)*2;
       var ty = 1 - (event.clientY / this.HEIGHT)*2;
       this.ui.mouse = {x:tx, y:ty};
-    },
-
-    createAirplane () {
-      let airplane = new Airplane();
-      return airplane
     },
 
     createSky () {
@@ -163,21 +170,8 @@ export default {
       return mesh
     },
 
-    createSea () {
-      var geom = new THREE.CylinderGeometry(600,600,800,40,10)
-      geom.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI/2))
-      var mat = new THREE.MeshPhongMaterial({
-        color:Colors.blue,
-        transparent:true,
-        opacity:.6,
-        shading:THREE.FlatShading,
-      })
-      var mesh = new THREE.Mesh(geom, mat)
-      mesh.receiveShadow = true
-      return mesh
-    },
-
     createLights () {
+      let ambientLight = new THREE.AmbientLight(0xdc8874, .5);
       let hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0x000000, .9)
       let shadowLight = new THREE.DirectionalLight(0xffffff, .9);
       shadowLight.castShadow = true;
@@ -189,7 +183,7 @@ export default {
       shadowLight.shadow.camera.far = 1000;
       shadowLight.shadow.mapSize.width = 2048;
       shadowLight.shadow.mapSize.height = 2048;
-      return [hemisphereLight, shadowLight]
+      return [hemisphereLight, ambientLight, shadowLight]
     },
 
     createCamera () {
