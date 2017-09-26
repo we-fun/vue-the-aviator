@@ -1,17 +1,28 @@
 <template>
+<div class="world" @mousemove="handleMouseMove">
   <renderer :obj="renderer" :size="renderSize">
     <scene :obj="scene">
       <camera :obj="camera"
         :position="ui.camera.position"></camera>
+
+      <!-- 先注释掉这个light 效果不对 可能是three版本变化 -->
+      <!--<light :obj="light1"></light>-->
+      <light :obj="light2"
+        :position="ui.light2.position"></light>
+
       <object3d :obj="sea"
         :position="ui.sea.position"
         :rotation="ui.sea.rotation"></object3d>
       <object3d :obj="sky"
         :position="ui.sky.position"
         :rotation="ui.sky.rotation"></object3d>
+      <object3d :obj="airplane.mesh"
+        :scale="ui.airplane.scale"
+        :position="ui.airplane.position"></object3d>
       <animation :fn="loop"></animation>
     </scene>
   </renderer>
+</div>
 </template>
 
 <script>
@@ -21,7 +32,7 @@
 /* eslint-disable keyword-spacing */
 /* eslint-disable space-before-function-paren */
 import * as THREE from 'three'
-import AirPlane from './AirPlane'
+import Airplane from './Airplane'
 import { Colors } from './common'
 
 function normalize(v, vmin, vmax, tmin, tmax){
@@ -41,6 +52,7 @@ export default {
       ui: {
         mouse: { x: 0, y: 0 },
         airplane: {
+          scale: .25,
           position: { y: 100 }
         },
         sea: {
@@ -50,6 +62,9 @@ export default {
         sky: {
           position: { y: -600 },
           rotation: { z: 0 }
+        },
+        light2: {
+          position: { x: 150, y: 350, z: 350 }
         },
         camera: {
           position: { x: 0, y: 100, z: 200 }
@@ -73,10 +88,11 @@ export default {
     this.renderer = this.createRenderer()
     this.scene = this.createScene()
     this.camera = this.createCamera()
+    ;[this.light1, this.light2] = this.createLights()
 
     this.sea = this.createSea()
     this.sky = this.createSky()
-    this.airplane = this.createAirPlane()
+    this.airplane = this.createAirplane()
   },
 
   methods: {
@@ -90,15 +106,20 @@ export default {
       this.ui.airplane.position.x = targetX;
       if (this.airplane && this.airplane.propeller) this.airplane.propeller.rotation.x += 0.3;
     },
+    handleMouseMove (e) {
+      var tx = -1 + (event.clientX / this.WIDTH)*2;
+      var ty = 1 - (event.clientY / this.HEIGHT)*2;
+      this.ui.mouse = {x:tx, y:ty};
+    },
 
-    createAirPlane () {
-      let airplane = new AirPlane();
-      airplane.mesh.scale.set(.25,.25,.25);
+    createAirplane () {
+      let airplane = new Airplane();
       return airplane
     },
 
     createSky () {
       let mesh = new THREE.Object3D()
+      mesh.name = 'sky'
       let nClouds = 20
       let clouds = []
       var stepAngle = Math.PI*2 / nClouds
@@ -156,6 +177,21 @@ export default {
       return mesh
     },
 
+    createLights () {
+      let hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0x000000, .9)
+      let shadowLight = new THREE.DirectionalLight(0xffffff, .9);
+      shadowLight.castShadow = true;
+      shadowLight.shadow.camera.left = -400;
+      shadowLight.shadow.camera.right = 400;
+      shadowLight.shadow.camera.top = 400;
+      shadowLight.shadow.camera.bottom = -400;
+      shadowLight.shadow.camera.near = 1;
+      shadowLight.shadow.camera.far = 1000;
+      shadowLight.shadow.mapSize.width = 2048;
+      shadowLight.shadow.mapSize.height = 2048;
+      return [hemisphereLight, shadowLight]
+    },
+
     createCamera () {
       let aspectRatio = this.WIDTH / this.HEIGHT
       let fieldOfView = 60
@@ -172,6 +208,13 @@ export default {
     createScene () {
       let scene = new THREE.Scene()
       scene.fog = new THREE.Fog(0xf7d9aa, 100,950)
+
+      // for threejs-inspector to work
+      // https://github.com/jeromeetienne/threejs-inspector
+      // if (process.env.NODE_ENV === 'development') {
+      //   window.THREE = THREE
+      //   window.scene = scene
+      // }
       return scene
     },
     createRenderer () {
@@ -190,4 +233,13 @@ body { margin: 0; overflow: hidden; }
 
 <style scoped>
 .panel { position: absolute; right: 0 }
+
+.world {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	background: -webkit-linear-gradient(#e4e0ba, #f7d9aa);
+	background: linear-gradient(#e4e0ba, #f7d9aa);
+}
 </style>
