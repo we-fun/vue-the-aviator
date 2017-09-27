@@ -26,23 +26,18 @@
 </template>
 
 <script>
-/* eslint-disable semi, comma-spacing, key-spacing */
-/* eslint-disable comma-dangle, space-infix-ops, no-floating-decimal */
-/* eslint-disable space-before-blocks, space-in-parens, quotes */
-/* eslint-disable keyword-spacing */
-/* eslint-disable space-before-function-paren */
 import * as THREE from 'three'
 import Airplane from './Airplane'
 import Sea from './Sea'
 import { Colors } from './common'
 
-function normalize(v, vmin, vmax, tmin, tmax){
-  var nv = Math.max(Math.min(v,vmax), vmin);
-  var dv = vmax-vmin;
-  var pc = (nv-vmin)/dv;
-  var dt = tmax-tmin;
-  var tv = tmin + (pc*dt);
-  return tv;
+function normalize (v, vmin, vmax, tmin, tmax) {
+  var nv = Math.max(Math.min(v, vmax), vmin)
+  var dv = vmax - vmin
+  var pc = (nv - vmin) / dv
+  var dt = tmax - tmin
+  var tv = tmin + (pc * dt)
+  return tv
 }
 
 export default {
@@ -53,7 +48,7 @@ export default {
       ui: {
         mouse: { x: 0, y: 0 },
         airplane: {
-          scale: .25,
+          scale: 0.25,
           position: { y: 100 }
         },
         sea: {
@@ -99,29 +94,29 @@ export default {
   methods: {
     loop () {
       this.sea.moveWaves()
-      this.ui.sea.rotation.z += .005
-      this.ui.sky.rotation.z += .01
+      this.ui.sea.rotation.z += 0.005
+      this.ui.sky.rotation.z += 0.01
       this.airplane.pilot.updateHairs()
       this.updatePlane()
       this.updateCamera()
     },
     updateCamera () {
       let { camera, ui: { mouse } } = this
-      camera.fov = normalize(mouse.x,-1,1,40, 80);
-      camera.updateProjectionMatrix();
+      camera.fov = normalize(mouse.x, -1, 1, 40, 80)
+      camera.updateProjectionMatrix()
     },
     updatePlane () {
       let { airplane, ui: { mouse } } = this
-      var targetY = normalize(mouse.y,-.75,.75,25, 175);
-      airplane.mesh.position.y += (targetY-airplane.mesh.position.y)*0.1;
-      airplane.mesh.rotation.z = (targetY-airplane.mesh.position.y)*0.0128;
-      airplane.mesh.rotation.x = (airplane.mesh.position.y-targetY)*0.0064;
-      airplane.propeller.rotation.x += 0.3;
+      var targetY = normalize(mouse.y, -0.75, 0.75, 25, 175)
+      airplane.mesh.position.y += (targetY - airplane.mesh.position.y) * 0.1
+      airplane.mesh.rotation.z = (targetY - airplane.mesh.position.y) * 0.0128
+      airplane.mesh.rotation.x = (airplane.mesh.position.y - targetY) * 0.0064
+      airplane.propeller.rotation.x += 0.3
     },
     handleMouseMove (e) {
-      var tx = -1 + (event.clientX / this.WIDTH)*2;
-      var ty = 1 - (event.clientY / this.HEIGHT)*2;
-      this.ui.mouse = {x:tx, y:ty};
+      var tx = -1 + (event.clientX / this.WIDTH) * 2
+      var ty = 1 - (event.clientY / this.HEIGHT) * 2
+      this.ui.mouse = {x: tx, y: ty}
     },
 
     createSky () {
@@ -129,18 +124,18 @@ export default {
       mesh.name = 'sky'
       let nClouds = 20
       let clouds = []
-      var stepAngle = Math.PI*2 / nClouds
-      for (var i=0; i<nClouds; i++) {
+      var stepAngle = Math.PI * 2 / nClouds
+      for (var i = 0; i < nClouds; i++) {
         var c = this.createCloud()
         clouds.push(c)
-        var a = stepAngle*i
-        var h = 750 + Math.random()*200
-        c.position.y = Math.sin(a)*h
-        c.position.x = Math.cos(a)*h
-        c.position.z = -400-Math.random()*400
-        c.rotation.z = a + Math.PI/2
-        var s = 1+Math.random()*2
-        c.scale.set(s,s,s)
+        var a = stepAngle * i
+        var h = 750 + Math.random() * 200
+        c.position.y = Math.sin(a) * h
+        c.position.x = Math.cos(a) * h
+        c.position.z = -400 - Math.random() * 400
+        c.rotation.z = a + Math.PI / 2
+        var s = 1 + Math.random() * 2
+        c.scale.set(s, s, s)
         mesh.add(c)
       }
       return mesh
@@ -148,21 +143,21 @@ export default {
     createCloud () {
       let mesh = new THREE.Object3D()
       mesh.name = 'cloud'
-      var geom = new THREE.CubeGeometry(20,20,20)
+      var geom = new THREE.CubeGeometry(20, 20, 20)
       var mat = new THREE.MeshPhongMaterial({
-        color: Colors.white,
+        color: Colors.white
       })
 
-      var nBlocs = 3+Math.floor(Math.random()*3)
-      for (var i=0; i<nBlocs; i++ ) {
+      var nBlocs = 3 + Math.floor(Math.random() * 3)
+      for (var i = 0; i < nBlocs; i++) {
         var m = new THREE.Mesh(geom.clone(), mat)
-        m.position.x = i*15
-        m.position.y = Math.random()*10
-        m.position.z = Math.random()*10
-        m.rotation.z = Math.random()*Math.PI*2
-        m.rotation.y = Math.random()*Math.PI*2
-        var s = .1 + Math.random()*.9
-        m.scale.set(s,s,s)
+        m.position.x = i * 15
+        m.position.y = Math.random() * 10
+        m.position.z = Math.random() * 10
+        m.rotation.z = Math.random() * Math.PI * 2
+        m.rotation.y = Math.random() * Math.PI * 2
+        var s = 0.1 + Math.random() * 0.9
+        m.scale.set(s, s, s)
         m.castShadow = true
         m.receiveShadow = true
         mesh.add(m)
@@ -171,18 +166,18 @@ export default {
     },
 
     createLights () {
-      let ambientLight = new THREE.AmbientLight(0xdc8874, .5);
-      let hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0x000000, .9)
-      let shadowLight = new THREE.DirectionalLight(0xffffff, .9);
-      shadowLight.castShadow = true;
-      shadowLight.shadow.camera.left = -400;
-      shadowLight.shadow.camera.right = 400;
-      shadowLight.shadow.camera.top = 400;
-      shadowLight.shadow.camera.bottom = -400;
-      shadowLight.shadow.camera.near = 1;
-      shadowLight.shadow.camera.far = 1000;
-      shadowLight.shadow.mapSize.width = 2048;
-      shadowLight.shadow.mapSize.height = 2048;
+      let ambientLight = new THREE.AmbientLight(0xdc8874, 0.5)
+      let hemisphereLight = new THREE.HemisphereLight(0xaaaaaa, 0x000000, 0.9)
+      let shadowLight = new THREE.DirectionalLight(0xffffff, 0.9)
+      shadowLight.castShadow = true
+      shadowLight.shadow.camera.left = -400
+      shadowLight.shadow.camera.right = 400
+      shadowLight.shadow.camera.top = 400
+      shadowLight.shadow.camera.bottom = -400
+      shadowLight.shadow.camera.near = 1
+      shadowLight.shadow.camera.far = 1000
+      shadowLight.shadow.mapSize.width = 2048
+      shadowLight.shadow.mapSize.height = 2048
       return [hemisphereLight, ambientLight, shadowLight]
     },
 
@@ -201,7 +196,7 @@ export default {
     },
     createScene () {
       let scene = new THREE.Scene()
-      scene.fog = new THREE.Fog(0xf7d9aa, 100,950)
+      scene.fog = new THREE.Fog(0xf7d9aa, 100, 950)
 
       // for threejs-inspector to work
       // https://github.com/jeromeetienne/threejs-inspector
