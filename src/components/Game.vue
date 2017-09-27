@@ -5,9 +5,8 @@
       <camera :obj="camera"
         :position="ui.camera.position"></camera>
 
-      <!-- 先注释掉这个light 效果不对 可能是three版本变化 -->
-      <!--<light :obj="lights[0]"></light>-->
-      <!-- <light :obj="lights[1]"></light> -->
+      <light :obj="lights[0]"></light>
+      <light :obj="lights[1]"></light>
       <light :obj="lights[2]"
         :position="ui.light2.position"></light>
 
@@ -102,6 +101,7 @@ export default {
       this.sea.moveWaves()
       this.ui.sea.rotation.z += .005
       this.ui.sky.rotation.z += .01
+      this.airplane.pilot.updateHairs()
       this.updatePlane()
       this.updateCamera()
     },

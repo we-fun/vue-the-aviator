@@ -30,6 +30,7 @@ export default class Sea {
     });
 
     this.mesh = new THREE.Mesh(geom, mat);
+    this.mesh.name = 'sea'
     this.mesh.receiveShadow = true;
   }
 

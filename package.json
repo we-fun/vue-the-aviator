@@ -14,7 +14,7 @@
     "three": "^0.87.1",
     "vue": "^2.4.2",
     "vue-router": "^2.7.0",
-    "vue-threejs": "0.0.4"
+    "vue-threejs": "0.0.x"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
