@@ -2,6 +2,10 @@
 
 > A Vue.js project
 
+## Heads up!
+
+1. If you were npm-linking `vue-threejs`, don't forget to link `three`, so there won't be confusing stuffs happened (instanceof not working, threejs-inspector [went into a debugger](https://github.com/jeromeetienne/threejs-inspector/issues/26), etc). `vue-threejs` should try to handle it as well.
+
 ## Build Setup
 
 ``` bash

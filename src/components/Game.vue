@@ -205,10 +205,10 @@ export default {
 
       // for threejs-inspector to work
       // https://github.com/jeromeetienne/threejs-inspector
-      // if (process.env.NODE_ENV === 'development') {
-      //   window.THREE = THREE
-      //   window.scene = scene
-      // }
+      if (process.env.NODE_ENV === 'development') {
+        window.THREE = THREE
+        window.scene = scene
+      }
       return scene
     },
     createRenderer () {
