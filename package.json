@@ -2,7 +2,7 @@
   "name": "vue-the-aviator",
   "version": "1.0.0",
   "description": "A Vue.js project",
-  "author": "Fritz Lin <***REMOVED***>",
+  "author": "Fritz Lin <uxfritz@163.com>",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
