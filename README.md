@@ -1,5 +1,9 @@
 # vue-the-aviator
 
+<img src=WX20231125-232209.png>
+
+Demo: https://we-fun.github.io/vue-the-aviator/
+
 > A Vue.js version of the Aviator:
 - https://tympanus.net/codrops/2016/04/26/the-aviator-animating-basic-3d-scene-threejs/
 - https://tympanus.net/Tutorials/TheAviator/
